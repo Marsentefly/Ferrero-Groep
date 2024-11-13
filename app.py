@@ -57,6 +57,10 @@ def ensure_data_entry(equipment_id):
         data[equipment_id]['last_updated'] = 'N/A'
     save_processed_equipment_data(data)
 
+@app.route('/import_data', methods=['GET'])
+def import_data():
+    return render_template('main.html')
+
 def update_details_from_old(operator_id, equipment_id, work_area_id, time, hours, last_update_date):
     data = get_processed_equipment_data()
     ensure_data_entry(equipment_id)  # Ensures the equipment ID exists in the data and all keys are initialized
