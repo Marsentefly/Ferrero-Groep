@@ -1,0 +1,27 @@
+/* test.css content */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 20px;
+    color: #333;
+}
+
+h1 {
+    color: #4a47a3;
+    text-align: center;
+}
+
+p {
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 20px;
+}
+
+a {
+    color: #5b8def;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
