@@ -267,6 +267,9 @@ def main_page():
     for equipment in warning_list:
         print(f"Main Route: Equipment ID: {equipment['equipment_id']}, Last Updated: {equipment['last_updated']}")
 
+    print(warning_list)  # Check what's inside this list
+    print(service_hours_threshold)  # Ensure this has a sensible value
+
     return render_template('main_screen.html', warning_list=warning_list, service_hours_threshold=service_hours_threshold)
 
 @app.route('/import_data', methods=['GET'])
