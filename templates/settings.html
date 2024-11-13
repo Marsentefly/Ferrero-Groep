@@ -1,0 +1,27 @@
+<!-- settings.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Settings</title>
+</head>
+<body>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <h1>Settings</h1>
+        <form method="post" action="/save_settings">
+            <label for="threshold" class="form-label">Service Hours Threshold:</label>
+            <input type="number" id="threshold" name="threshold" value="{{ current_threshold }}" class="input-field">
+            <button type="submit" class="view-data-button">Save Settings</button>
+        </form>
+        <a href="/" class="back-button">X</a>
+    </div>
+</body>
+</html>

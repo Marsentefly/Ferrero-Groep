@@ -1,0 +1,70 @@
+<!-- processed_data.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Processed Equipment Data</title>
+    <script>
+        function searchEquipment() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll('.equipment-row');
+
+            rows.forEach(row => {
+                const name = row.querySelector('.equipment-name').textContent.toLowerCase();
+                const registration = row.querySelector('.equipment-registration').textContent.toLowerCase();
+
+                if (name.includes(filter) || registration.includes(filter)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Processed Equipment Data</h1>
+        <input type="text" id="searchInput" onkeyup="searchEquipment()" placeholder="Search for equipment name or registration number..">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Registration Number</th>
+                    <th>Hours</th>
+                    <th>Next Service Hours</th>
+                    <th>Weeks to Service</th>
+                    <th>Last Updated</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in result_data %}
+                <tr class="equipment-row">
+                    <td class="equipment-name">{{ record.name }}</td>
+                    <td class="equipment-registration">{{ record.registration_number }}</td>
+                    <td>{{ record.hours }}</td>
+                    <td>{{ record.next_service_hours }}</td>
+                    <td>
+                        {% set hours_left = record.next_service_hours | int - record.hours | int %}
+                        {% set weeks_left = (hours_left / (10.5 * 7)) %}
+                        {% if weeks_left < 1 %}
+                            {{ (hours_left / 10.5) | round }} day{{ 's' if (hours_left / 10.5) | round != 1 else '' }}
+                        {% else %}
+                            {{ weeks_left | round(1) }} week{{ 's' if weeks_left | round(1) != 1 else '' }}
+                        {% endif %}
+                    </td>
+                    <td>{{ record.last_updated }}</td>
+                    <td><a href="/equipment/{{ record.equipment_id }}">View Details</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/" class="back-button">X</a>
+    </div>
+</body>
+</html>
+

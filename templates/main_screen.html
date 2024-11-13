@@ -1,0 +1,72 @@
+<!-- main_screen.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Main Screen</title>
+    <script>
+        function openServiceThresholdPopup() {
+            const popup = document.getElementById('service-threshold-popup');
+            popup.style.display = 'block';
+        }
+
+        function closeServiceThresholdPopup() {
+            const popup = document.getElementById('service-threshold-popup');
+            popup.style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Equipment Management</h1>
+        <div class="button-container">
+            <a href="/import_data" class="view-data-button">Import Data</a>
+            <a href="/processed_data" class="view-data-button">View Data</a>
+            <a href="/settings" class="view-data-button">Settings</a>  <!-- Settings Link -->
+        </div>
+
+        <h2>Upcoming Services (Within {{ service_hours_threshold }} Hours)</h2>
+
+        {% if warning_list %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Registration Number</th>
+                        <th>Current Hours</th>
+                        <th>Next Service Hours</th>
+                        <th>Weeks to Service</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for equipment in warning_list %}
+                    <tr>
+                        <td>{{ equipment['name'] }}</td>
+                        <td>{{ equipment['registration_number'] }}</td>
+                        <td>{{ equipment['current_hours'] }}</td>
+                        <td>{{ equipment['next_service_hours'] }}</td>
+                        <td>
+                            {% set hours_left = equipment['next_service_hours'] | int - equipment['current_hours'] | int %}
+                            {% set weeks_left = (hours_left / (10.5 * 7)) %}
+                            {% if weeks_left < 1 %}
+                                {{ (hours_left / 10.5) | round }} day{{ 's' if (hours_left / 10.5) | round != 1 else '' }}
+                            {% else %}
+                                {{ weeks_left | round(1) }} week{{ 's' if weeks_left | round(1) != 1 else '' }}
+                            {% endif %}
+                        </td>
+                        <td>{{ equipment['last_updated'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No equipment is due for service within the next {{ service_hours_threshold }} hours.</p>
+        {% endif %}
+
+        <a href="/logout" class="logout-button">Logout</a>
+    </div>
+</body>
+</html>

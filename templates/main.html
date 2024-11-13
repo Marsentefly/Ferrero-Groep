@@ -1,0 +1,47 @@
+<!-- main.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Upload Equipment Data</title>
+    <script>
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function triggerFileInput() {
+            document.getElementById('file-input').click();
+        }
+
+        function updateFileName() {
+            const input = document.getElementById('file-input');
+            const label = document.getElementById('file-name');
+            if (input.files.length > 0) {
+                label.innerText = input.files.length + " file(s) selected";
+            } else {
+                label.innerText = "No file chosen";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Equipment Data</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
+            <div class="custom-file-input">
+                <input type="file" id="file-input" name="folder" webkitdirectory directory multiple required onchange="updateFileName()" hidden>
+                <button type="button" onclick="triggerFileInput()" class="upload-button">Choose Files</button>
+                <span id="file-name">No file chosen</span>
+            </div>
+            <button type="submit">Upload Files</button>
+        </form>
+        <div id="loading" style="display:none;">
+            <p>Loading, please wait...</p>
+            <div class="loader"></div>
+        </div>
+        <a href="/" class="back-button">X</a>
+    </div>
+</body>
+</html>

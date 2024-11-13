@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Upload Status</title>
+    <script>
+        function checkTaskStatus() {
+            fetch('/task_status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status').innerText = 'Status: ' + data.status;
+                    document.getElementById('progress').innerText = 'Progress: ' + data.progress + '%';
+
+                    // If the task is not complete, poll again in 2 seconds
+                    if (data.status !== 'SUCCESS' && data.status !== 'Failed') {
+                        setTimeout(checkTaskStatus, 2000);
+                    } else if (data.status === 'SUCCESS') {
+                        document.getElementById('status').innerText = 'Upload Completed Successfully!';
+                    } else if (data.status === 'Failed') {
+                        document.getElementById('status').innerText = 'Upload Failed. Please try again.';
+                    }
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkTaskStatus();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Status</h1>
+        <p id="status">Checking upload status...</p>
+        <p id="progress"></p>
+    </div>
+    <a href="/" class="back-button">X</a>
+</body>
+</html>

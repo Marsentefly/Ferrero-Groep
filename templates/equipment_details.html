@@ -1,0 +1,130 @@
+<!-- equipment_details.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Equipment Details - {{ equipment_id }}</title>
+    <script>
+        function openEditPopup() {
+            const popup = document.getElementById('edit-popup');
+            popup.style.display = 'block';
+        }
+
+        function closeEditPopup() {
+            const popup = document.getElementById('edit-popup');
+            popup.style.display = 'none';
+        }
+
+        function openNextServiceHoursPopup() {
+            const popup = document.getElementById('next-service-popup');
+            popup.style.display = 'block';
+        }
+
+        function closeNextServiceHoursPopup() {
+            const popup = document.getElementById('next-service-popup');
+            popup.style.display = 'none';
+        }
+
+        function openDeleteConfirmation() {
+            const popup = document.getElementById('delete-confirmation-popup');
+            popup.style.display = 'block';
+        }
+
+        function closeDeleteConfirmation() {
+            const popup = document.getElementById('delete-confirmation-popup');
+            popup.style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+    <a href="/processed_data" class="back-button back-button-circle">&#x2b05;</a>
+    <a href="/equipment/{{ equipment_id }}/history" class="view-history-button top-right">View Service History</a>
+    <div class="container">
+        <h1>Equipment Details for {{ equipment_id }}</h1>
+        <p><strong>Name:</strong> {{ details['name'] }}</p>
+        <p><strong>Registration Number:</strong> {{ details['registration_number'] }}</p>
+        {% if latest_record %}
+            <p><strong>Current Hours:</strong> {{ latest_record['hours'] }}</p>
+            <p><strong>Next Service Hours:</strong> {{ details['next_service_hours'] }}</p>
+            <p><strong>Service Interval:</strong> {{ details['service_interval'] }}</p>
+        {% else %}
+            <p>No records available for this equipment.</p>
+        {% endif %}
+
+        <!-- Button to edit equipment details -->
+        <button onclick="openEditPopup()" class="edit-button">&#9998; Edit Details</button>
+
+        <!-- Popup for editing equipment details -->
+<div id="edit-popup" class="edit-popup" style="display: none;">
+    <div class="popup-content">
+        <h2>Edit Equipment Details</h2>
+        <form action="/equipment/{{ equipment_id }}/edit" method="post">
+            <label for="new_name">New Name:</label>
+            <input type="text" name="new_name" id="new_name" value="{{ details['name'] }}"><br>
+
+            <label for="service_interval">Service Interval (Hours):</label>
+            <input type="number" name="service_interval" id="service_interval" value="{{ details['service_interval'] }}"><br>
+
+            <label for="registration_number">Registration Number:</label>
+            <input type="text" name="registration_number" id="registration_number" value="{{ details['registration_number'] }}"><br>
+
+            <label for="current_hours">Current Hours:</label>
+            <input type="number" name="current_hours" id="current_hours" value="{{ latest_record['hours'] if latest_record else '' }}"><br>
+
+            <button type="submit">Save Changes</button>
+            <button type="button" onclick="closeEditPopup()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+
+        <!-- Button to manually input next service hours -->
+        <button onclick="openNextServiceHoursPopup()" class="edit-button">Set Next Service Hours</button>
+
+        <!-- Popup for setting next service hours -->
+        <div id="next-service-popup" class="edit-popup" style="display: none;">
+            <div class="popup-content">
+                <h2>Set Next Service Hours</h2>
+                <form action="/equipment/{{ equipment_id }}/manual_next_service_hours" method="post">
+                    <label for="manual_next_service_hours">Next Service Hours:</label>
+                    <input type="text" name="manual_next_service_hours" id="manual_next_service_hours" required><br>
+
+                    <button type="submit">Save Changes</button>
+                    <button type="button" onclick="closeNextServiceHoursPopup()">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Form to add more details -->
+        <form method="post">
+            <label for="notes">Notes:</label>
+            <textarea name="notes" id="notes" style="width: 80%;">{{ details.get('notes', '') }}</textarea><br>
+
+            <button type="submit">Update Details</button>
+        </form>
+
+        <form action="/equipment/{{ equipment_id }}/serviced" method="post">
+            <label for="service_date">Service Date:</label>
+            <input type="date" name="service_date" id="service_date" required><br>
+            <button type="submit" class="has-been-serviced-button">Has Been Serviced</button>
+        </form>
+
+        <!-- Button to delete equipment -->
+        <button onclick="openDeleteConfirmation()" class="delete-button">&#128465; Delete Equipment</button>
+
+        <!-- Popup for delete confirmation -->
+        <div id="delete-confirmation-popup" class="edit-popup" style="display: none;">
+            <div class="popup-content">
+                <h2>Are you sure you want to delete this equipment?</h2>
+                <form action="/equipment/{{ equipment_id }}/delete" method="post">
+                    <button type="submit">Yes, Delete</button>
+                    <button type="button" onclick="closeDeleteConfirmation()">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
