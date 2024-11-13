@@ -1,0 +1,30 @@
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 20px;
+    color: #333;
+}
+
+/* Styling for the main heading */
+h1 {
+    color: #4a47a3;
+    text-align: center;
+}
+
+/* Styling for paragraph */
+p {
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 20px;
+}
+
+/* Styling for links */
+a {
+    color: #5b8def;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
