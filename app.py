@@ -8,6 +8,7 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'  # Use a strong secret key for sessions
 app.config['SESSION_TYPE'] = 'filesystem'  # Store sessions in the file system
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # Set max upload to 50 MB (or whatever you need)
 Session(app)
 
 # Global variable to store progress
