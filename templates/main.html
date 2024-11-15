@@ -34,10 +34,14 @@
                 <input type="file" id="file-input" name="folder" webkitdirectory directory multiple required onchange="updateFileName()" hidden>
                 <button type="button" onclick="triggerFileInput()" class="upload-button">Choose Files</button>
                 <span id="file-name">No file chosen</span>
-                <button type="submit" class="btn btn-primary">Generate Sample Equipment Data</button>
             </div>
             <button type="submit">Upload Files</button>
         </form>
+
+        <form action="{{ url_for('generate_equipment_data') }}" method="get">
+            <button type="submit" class="btn btn-primary">Generate Sample Equipment Data</button>
+        </form>
+
         <div id="loading" style="display:none;">
             <p>Loading, please wait...</p>
             <div class="loader"></div>
