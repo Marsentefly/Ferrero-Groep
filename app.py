@@ -22,7 +22,8 @@ def get_processed_equipment_data():
     with shelve.open('equipment_data.db') as db:
         if 'processed_equipment_data' not in db:
             db['processed_equipment_data'] = {}
-        data = db['processed_equipment_data']
+            db.sync()  # Ensure that it's saved
+        return db['processed_equipment_data']
 
     # Ensure each equipment entry has all necessary keys
     for equipment_id, details in data.items():
