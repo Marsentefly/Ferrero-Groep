@@ -58,49 +58,6 @@ def ensure_data_entry(equipment_id):
         data[equipment_id]['last_updated'] = 'N/A'
     save_processed_equipment_data(data)
 
-def update_details_from_old(operator_id, equipment_id, work_area_id, time, hours, last_update_date):
-    data = get_processed_equipment_data()
-    if equipment_id not in data:
-        print(f"Error: Equipment ID {equipment_id} not found.")
-        return
-
-    existing_record = next((r for r in data[equipment_id]['records'] if r['hours'] == hours), None)
-    if existing_record:
-        if int(hours) > int(existing_record['hours']):
-            existing_record['time'] = time
-            existing_record['hours'] = hours
-            data[equipment_id]['last_updated'] = last_update_date
-    else:
-        entry = {
-            'time': time,
-            'hours': hours,
-            'name': data[equipment_id]['name'],
-            'operator': data[operator_id]['operator'] if operator_id in data else '',
-            'work_area': data[work_area_id]['work_area'] if work_area_id in data else ''
-        }
-        data[equipment_id]['records'].append(entry)
-        data[equipment_id]['last_updated'] = last_update_date
-
-    save_processed_equipment_data(data)
-
-# Process .OLD files to update time and hours
-def process_old_file(file):
-    print("Processing .OLD file...")
-    filename = os.path.basename(file.filename)
-    last_update_date = filename.split('.')[0]
-
-    if len(last_update_date) == 8 and last_update_date.isdigit():
-        for line in file.stream:
-            line = line.decode('utf-8').strip()
-            match = re.match(r'"(.*?)","(.*?)","(.*?)","(.*?)","(.*?)","(.*?)"', line)
-            if match:
-                operator_id, equipment_id, work_area_id, time, _, hours = match.groups()
-                ensure_data_entry(equipment_id)  # Ensure entry exists before updating
-                update_details_from_old(operator_id, equipment_id, work_area_id, time, hours, last_update_date)
-    else:
-        print(f"Warning: The filename '{filename}' does not match the expected format (YYYYMMDD.OLD)")
-
-        
 # Generic processor for .n files that updates names, operators, or work areas based on IDs
 def process_n_files(file, detail_type):
     print(f"Processing {detail_type} file...")
@@ -127,6 +84,57 @@ def process_n_files(file, detail_type):
 
             print(f"Updated {detail_type} for {id}: {value}")
     save_processed_equipment_data(data)
+
+def update_details_from_old(operator_id, equipment_id, work_area_id, time, hours, last_update_date):
+    data = get_processed_equipment_data()
+
+    # Check if equipment_id exists, if not initialize it
+    if equipment_id not in data:
+        ensure_data_entry(equipment_id)
+
+    # Proceed with updating the details
+    existing_record = next((r for r in data[equipment_id]['records'] if r['hours'] == hours), None)
+    if existing_record:
+        # Update the existing record if the new one has more recent hours
+        if int(hours) > int(existing_record['hours']):
+            existing_record['time'] = time
+            existing_record['hours'] = hours
+            data[equipment_id]['last_updated'] = last_update_date
+    else:
+        # Create a new record without changing the equipment name
+        entry = {
+            'time': time,
+            'hours': hours,
+            'name': data[equipment_id]['name'],  # Keep existing name, do not overwrite
+            'operator': data[operator_id]['operator'] if operator_id in data else '',
+            'work_area': data[work_area_id]['work_area'] if work_area_id in data else ''
+        }
+        data[equipment_id]['records'].append(entry)
+        data[equipment_id]['last_updated'] = last_update_date
+
+    # Save data back to shelve
+    save_processed_equipment_data(data)
+
+    # Debugging print statement to verify the saved data
+    print(f"After saving: Equipment ID {equipment_id}, Last Updated: {data[equipment_id]['last_updated']}")
+
+# Process .OLD files to update time and hours
+def process_old_file(file):
+    print("Processing .OLD file...")
+    filename = os.path.basename(file.filename)  # Get the base filename without directory paths
+    last_update_date = filename.split('.')[0]  # Extract the date from filename, assuming format like 20240215.OLD
+
+    # Ensure the extracted value is exactly 8 characters (YYYYMMDD)
+    if len(last_update_date) == 8 and last_update_date.isdigit():
+        for line in file.stream:
+            line = line.decode('utf-8').strip()
+            match = re.match(r'"(.*?)","(.*?)","(.*?)","(.*?)","(.*?)","(.*?)"', line)
+            if match:
+                operator_id, equipment_id, work_area_id, time, _, hours = match.groups()
+                ensure_data_entry(equipment_id)  # Ensure the entry for equipment ID is created before updating
+                update_details_from_old(operator_id, equipment_id, work_area_id, time, hours, last_update_date)
+    else:
+        print(f"Warning: The filename '{filename}' does not match the expected format (YYYYMMDD.OLD)")
 
 @app.route('/upload', methods=['POST'])
 def upload_files():
