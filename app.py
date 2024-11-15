@@ -145,21 +145,24 @@ def upload_files():
     folder = request.files.getlist('folder')
     total_files = len(folder)
 
-for file in folder:
-    if file.filename.endswith('r.n'):
-        process_n_files(file, 'name')
-    elif file.filename.endswith('c.n'):
-        process_n_files(file, 'work_area')
-    elif file.filename.endswith('e.n'):
-        process_n_files(file, 'operator')
-        # Update progress
+    # Process .n files first
+    for i, file in enumerate(folder):
+        if file.filename.endswith('r.n'):
+            process_n_files(file, 'name')
+        elif file.filename.endswith('c.n'):
+            process_n_files(file, 'work_area')
+        elif file.filename.endswith('e.n'):
+            process_n_files(file, 'operator')
+
+        # Update progress after processing each .n file
         progress = int(((i + 1) / total_files) * 100)
 
     # Then, process .OLD files
-for file in folder:
-    if file.filename.endswith('.OLD'):
-        process_old_file(file)
+    for file in folder:
+        if file.filename.endswith('.OLD'):
+            process_old_file(file)
 
+    # Return after all files are processed
     return redirect(url_for('main_page'))
 
 @app.route('/upload_progress')
