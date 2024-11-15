@@ -145,19 +145,20 @@ def upload_files():
     folder = request.files.getlist('folder')
     total_files = len(folder)
 
-    for i, file in enumerate(folder):
-        filename = file.filename
-        if filename.endswith('.OLD'):
-            process_old_file(file)
-        elif filename.endswith('r.n'):
-            process_n_files(file, 'name')
-        elif filename.endswith('c.n'):
-            process_n_files(file, 'work_area')
-        elif filename.endswith('e.n'):
-            process_n_files(file, 'operator')
-
+for file in folder:
+    if file.filename.endswith('r.n'):
+        process_n_files(file, 'name')
+    elif file.filename.endswith('c.n'):
+        process_n_files(file, 'work_area')
+    elif file.filename.endswith('e.n'):
+        process_n_files(file, 'operator')
         # Update progress
         progress = int(((i + 1) / total_files) * 100)
+
+    # Then, process .OLD files
+for file in folder:
+    if file.filename.endswith('.OLD'):
+        process_old_file(file)
 
     return redirect(url_for('main_page'))
 
